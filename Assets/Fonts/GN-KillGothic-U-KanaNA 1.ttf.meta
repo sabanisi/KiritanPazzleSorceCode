@@ -1,0 +1,22 @@
+fileFormatVersion: 2
+guid: 806b8398b2d4746c19f037fde10cb361
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontNames:
+  - GN-KMBFont-UB-NewstyleKanaA
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: fe90c8d388e5845d2a7dd905a9f4b2d0, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

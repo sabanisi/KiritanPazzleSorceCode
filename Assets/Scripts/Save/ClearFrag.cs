@@ -6,6 +6,7 @@ public class ClearFrag
         sceneEnum = _scenEnum;
         isClear = _isClear;
     }
+
     public SceneEnum sceneEnum;
     public bool isClear;
 }

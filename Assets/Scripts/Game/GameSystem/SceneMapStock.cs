@@ -46,6 +46,7 @@ public class SceneMapStock : MonoBehaviour
     [SerializeField] public MapStruct StageChutorialSelect;
     [SerializeField] public MapStruct StageCredit;
     [SerializeField] public MapStruct StageFinish;
+    [SerializeField] public MapStruct ExtraMapSelect;
 
     [System.Serializable]
     [SerializeField]
@@ -144,9 +145,16 @@ public class SceneMapStock : MonoBehaviour
                 return StageChutorialSelect;
             case SceneEnum.StageCredit:
                 return StageCredit;
+            case SceneEnum.ExtraMapSelect:
+                return ExtraMapSelect;
+
+
+            case SceneEnum.StageMapCreate:
+                return Stage1;
+            case SceneEnum.StageExtraMapPlay:
+                return Stage1;
+
             case SceneEnum.StageFinish:
-                return StageFinish;
-            default:
                 Debug.Log(sceneEnum + " がない");
                 break;
         }

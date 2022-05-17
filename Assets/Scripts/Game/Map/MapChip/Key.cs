@@ -3,7 +3,7 @@ using System.Collections;
 
 public class Key : MonoBehaviour
 {
-    [SerializeField] Locked locked;
+    public Locked locked;
 
     private void OnTriggerEnter2D(Collider2D collision)
     {

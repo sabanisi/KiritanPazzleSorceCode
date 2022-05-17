@@ -71,6 +71,13 @@ public class Kiritan : MonoBehaviour
         return isDamage;
     }
 
+    //操作不能
+    private bool canPlay=true;
+    public void SetCanPlay(bool _canPlay)
+    {
+        canPlay = _canPlay;
+    }
+
 
     public void Initialize()
     {
@@ -82,6 +89,7 @@ public class Kiritan : MonoBehaviour
             rb.simulated = true;
         }
         isInWarpBlock = false;
+        canPlay = true;
     }
 
     private void Start()
@@ -133,7 +141,7 @@ public class Kiritan : MonoBehaviour
         {
             if (!isShotPrepare)
             {
-                if (Input.GetButtonDown("Shot")&&!isInWarpBlock)
+                if (Input.GetButtonDown("Shot")&&!isInWarpBlock&&canPlay)
                 {
                     _animator.Play("ShotPrepare");
                     isShotPrepare = true;
@@ -148,14 +156,14 @@ public class Kiritan : MonoBehaviour
                 Vector3 rotate = Vector3.zero;
                 Vector3 pos = _transform.position;
                 Sprite sprite = null;
-                if (Input.GetButtonDown("Up"))
+                if (Input.GetButtonDown("Up")&&canPlay)
                 {
                     isStart = true;
                     shotSpeed = new Vector3(0, 12, 0);
                     sprite = KiriImage.Shot3;
                     rotate = new Vector3(0, 0, 90);
                     pos += new Vector3(0.153f*_transform.localScale.x, 0.341f, 0);
-                }else if (Input.GetButtonDown("Down"))
+                }else if (Input.GetButtonDown("Down")&&canPlay)
                 {
                     isStart = true;
                     shotSpeed = new Vector3(0, -12, 0);
@@ -163,7 +171,7 @@ public class Kiritan : MonoBehaviour
                     rotate = new Vector3(0, 0, -90);
                     pos += new Vector3(0.049f * _transform.localScale.x,-0.366f, 0);
                 }
-                else if (Input.GetButtonDown("Right"))
+                else if (Input.GetButtonDown("Right")&&canPlay)
                 {
                     isStart = true;
                     shotSpeed = new Vector3(12, 0, 0);
@@ -179,7 +187,7 @@ public class Kiritan : MonoBehaviour
                     }
                     rotate = new Vector3(0, 0, 0);
                 }
-                else if (Input.GetButtonDown("Left"))
+                else if (Input.GetButtonDown("Left")&&canPlay)
                 {
                     isStart = true;
                     shotSpeed = new Vector3(-12, 0, 0);
@@ -195,7 +203,7 @@ public class Kiritan : MonoBehaviour
                     }
                     rotate = new Vector3(180, 0, 180);
                 }
-                else if (Input.GetButtonDown("Shot"))
+                else if (Input.GetButtonDown("Shot")&&canPlay)
                 {
                     isShotPrepare = false;
                     FinishShot();
@@ -243,7 +251,7 @@ public class Kiritan : MonoBehaviour
         {
             if (!isFlyPrepare)
             {
-                if (Input.GetButtonDown("Fly") && !isInWarpBlock)
+                if (Input.GetButtonDown("Fly") && !isInWarpBlock&&canPlay)
                 {
                     _animator.enabled = false;
                     isFlyPrepare = true;
@@ -256,7 +264,7 @@ public class Kiritan : MonoBehaviour
             {
                 rb.velocity = new Vector2(0, rb.velocity.y);
                 bool isStart = false;
-                if (Input.GetButtonDown("Up"))
+                if (Input.GetButtonDown("Up")&&canPlay)
                 {
                     isStart = true;
                     flySpeed = new Vector3(0, 9, 0);
@@ -265,7 +273,7 @@ public class Kiritan : MonoBehaviour
                     Fire.transform.rotation = Quaternion.Euler(180, 0, 0);
                     _flyEnum = FlyEnum.Vertical;
                 }
-                else if (Input.GetButtonDown("Down"))
+                else if (Input.GetButtonDown("Down")&&canPlay)
                 {
                     isStart = true;
                     flySpeed = new Vector3(0, -9, 0);
@@ -275,7 +283,7 @@ public class Kiritan : MonoBehaviour
                     _flyEnum = FlyEnum.Vertical;
                     _transform.localScale = new Vector3(_transform.localScale.x, -1, 1);
                 }
-                else if (Input.GetButtonDown("Right"))
+                else if (Input.GetButtonDown("Right")&&canPlay)
                 {
                     isStart = true;
                     flySpeed = new Vector3(9, 0, 0);
@@ -285,7 +293,7 @@ public class Kiritan : MonoBehaviour
                     Fire.transform.rotation = Quaternion.Euler(180, 0, 90);
                     _flyEnum = FlyEnum.Horizontal;
                 }
-                else if (Input.GetButtonDown("Left"))
+                else if (Input.GetButtonDown("Left")&&canPlay)
                 {
                     isStart = true;
                     flySpeed = new Vector3(-9, 0, 0);
@@ -294,7 +302,7 @@ public class Kiritan : MonoBehaviour
                     Fire.transform.localPosition = _FirePos.Right;
                     Fire.transform.rotation = Quaternion.Euler(180, 0, -90);
                     _flyEnum = FlyEnum.Horizontal;
-                }else if (Input.GetButtonDown("Fly"))
+                }else if (Input.GetButtonDown("Fly")&&canPlay)
                 {
                     isFlyPrepare = false;
                     FinishFly();
@@ -318,6 +326,7 @@ public class Kiritan : MonoBehaviour
     private void MoveDeal()
     {
         float vertical = Input.GetAxis("Horizontal");
+        if (!canPlay) vertical = 0;
         Vector3 speedVector;
         if (vertical > 0)
         {
@@ -336,7 +345,7 @@ public class Kiritan : MonoBehaviour
 
         if (_groundCheck.IsGround())
         {
-            if (Input.GetButtonDown("Jump"))
+            if (Input.GetButtonDown("Jump")&&canPlay)
             {
                 speedVector = new Vector3(speedVector.x, jumpHeight, 0);
                 SoundManager.PlaySE(SoundManager.SE_Type.JumpVoice1);

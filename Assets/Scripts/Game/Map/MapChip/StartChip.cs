@@ -21,6 +21,5 @@ public class StartChip : MonoBehaviour
         Kiritan player = Instantiate(PlayerPrefab,transform.parent.parent);
         player.transform.position = transform.localPosition;
         return player;
-           
     }
 }

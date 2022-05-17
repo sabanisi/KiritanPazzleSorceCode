@@ -7,6 +7,8 @@ public class SceneChangeManager: MonoBehaviour
 
     [SerializeField] private TitleScene _titleScene;
     [SerializeField] private GameScene _gameScene;
+    [SerializeField] private MapCreateScene _mapCreateScene;
+    [SerializeField] private ExtraMapPlayScene _extraMapPlayScene;
 
     [SerializeField] private Transform CurtainTF;
     [SerializeField] private GameObject Curtain;
@@ -45,20 +47,34 @@ public class SceneChangeManager: MonoBehaviour
         if (fromSceneEnum != SceneEnum.None)
         {
             CurtainMove(0, 0.5f, 0.2f, "easeInCubic");
-            yield return new WaitForSeconds(1.5f);
-            if (!fromSceneEnum.Equals(SceneEnum.Title))
+            yield return new WaitForSeconds(0.55f);
+
+            if (!fromSceneEnum.Equals(SceneEnum.Title)&&!fromSceneEnum.Equals(SceneEnum.MapCreate))
             {
                 _gameScene.CashDeal();
             }
         }
+
         _titleScene.gameObject.SetActive(false);
         _gameScene.gameObject.SetActive(false);
-        CurtainMove(10f, 0.5f, 0f, "easeOutCubic");
+        _mapCreateScene.gameObject.SetActive(false);
+        _extraMapPlayScene.gameObject.SetActive(false);
+
         if (toSceneEnum.Equals(SceneEnum.Title))
         {
             _titleScene.gameObject.SetActive(true);
             _titleScene.Initialize();
             SoundManager.PlayBGM(SoundManager.BGM_Type.Title);
+        }
+        else if (toSceneEnum.Equals(SceneEnum.MapCreate))
+        {
+            _mapCreateScene.gameObject.SetActive(true);
+            _mapCreateScene.Initialize(fromSceneEnum);
+        }
+        else if (toSceneEnum.Equals(SceneEnum.ExtraMapPlay))
+        {
+            _extraMapPlayScene.gameObject.SetActive(true);
+            _extraMapPlayScene.Initialize(fromSceneEnum);
         }
         else
         {
@@ -67,7 +83,28 @@ public class SceneChangeManager: MonoBehaviour
         }
         isChange = false;
         Curtain2Sprite.color = new Color(0.7f, 0.7f, 0.7f, 0);
+
+        if (!fromSceneEnum.Equals(SceneEnum.None))
+        {
+           
+            yield return new WaitForSeconds(0.4f);
+            if(fromSceneEnum.Equals(SceneEnum.ExtraMapPlay))
+            {
+               StartCoroutine(WaitExtraMapInitialize());
+                yield return new WaitForSeconds(0.1f);
+            }
+        }
+        CurtainMove(10f, 0.5f, 0f, "easeOutCubic");
+
         yield return new WaitForSeconds(0.7f);
+    }
+
+    private IEnumerator WaitExtraMapInitialize()
+    {
+        while (!_extraMapPlayScene.IsReady())
+        {
+            yield return null;
+        }
     }
 
     private void CurtainMove(float toY, float time, float delay, string easeType)

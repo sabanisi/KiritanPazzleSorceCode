@@ -22,6 +22,13 @@ public class StageGenerator : MonoBehaviour
     [SerializeField] private string GoalName = "Goal";
     [SerializeField] private GoalChip GoalPrefab;
 
+    [SerializeField] private Key KeyPrefab;
+    [SerializeField] private Locked LockedPrefab;
+    [SerializeField] private Warp WarpPrefab;
+    private Key keyInstance;
+    private Locked lockedInstance;
+    private Warp warpInstance;
+
     [SerializeField] private Transform _transform;
 
     private StartChip _startChip;
@@ -29,6 +36,10 @@ public class StageGenerator : MonoBehaviour
 
     public Kiritan Initialize(Tilemap tile)
     {
+        keyInstance = null;
+        lockedInstance = null;
+        warpInstance = null;
+
         DestroyBlock();
         CreateMap(tile);
         return _startChip.Initialize();
@@ -119,5 +130,96 @@ public class StageGenerator : MonoBehaviour
                 Debug.Log(chipEnum + "がない");
                 break;
         }
+    }
+
+    //MapMemoryの情報を元にマップを作成する
+    public Kiritan InitializeByMapMemory()
+    {
+        DestroyBlock();
+        keyInstance = null;
+        lockedInstance = null;
+        warpInstance = null;
+        MapChipEnum[,] stageArray = MapMemory.instance.stageArray;
+
+        //外周にブロックを配置
+        for(int x = -1; x <= 16; x++)
+        {
+            BlockChip block = Instantiate(BlockPrefab, _transform);
+            block.transform.localPosition = new Vector3(x,-1, 0);
+            BlockChip block2 = Instantiate(BlockPrefab, _transform);
+            block2.transform.localPosition = new Vector3(x,9, 0);
+        }
+        for(int y = 0; y <= 8; y++)
+        {
+            BlockChip block = Instantiate(BlockPrefab, _transform);
+            block.transform.localPosition = new Vector3(-1,y, 0);
+            BlockChip block2 = Instantiate(BlockPrefab, _transform);
+            block2.transform.localPosition = new Vector3(16,y, 0);
+        }
+
+        for (int x = 0; x <stageArray.GetLength(0); x++)
+        {
+            for(int y = 0; y < stageArray.GetLength(1); y++)
+            {
+                switch (stageArray[x, y])
+                {
+                    case MapChipEnum.Block:
+                        BlockChip block = Instantiate(BlockPrefab, _transform);
+                        block.transform.localPosition = new Vector3(x, y, 0);
+                        break;
+                    case MapChipEnum.CanDestroyBlock:
+                        BlockChip block2 = Instantiate(BlockPrefab2, _transform);
+                        block2.transform.localPosition = new Vector3(x, y, 0);
+                        break;
+                    case MapChipEnum.CanMoveBlock:
+                        BlockChip block3 = Instantiate(BlockPrefab3, _transform);
+                        block3.transform.localPosition = new Vector3(x, y, 0);
+                        break;
+                    case MapChipEnum.Start:
+                        StartChip start = Instantiate(StartPrefab, _transform);
+                        start.transform.localPosition = new Vector3(x,y,0);
+                        _startChip = start;
+                        break;
+                    case MapChipEnum.Goal:
+                        GoalChip goal = Instantiate(GoalPrefab, _transform);
+                        goal.transform.localPosition = new Vector3(x, y, 0);
+                        break;
+                    case MapChipEnum.CanKillBlock:
+                        BlockChip block4 = Instantiate(BlockPrefab4, _transform);
+                        block4.transform.localPosition = new Vector3(x,y,0);
+                        break;
+                    case MapChipEnum.Key:
+                        Key key = Instantiate(KeyPrefab, _transform);
+                        key.transform.localPosition = new Vector3(x, y, 0);
+                        keyInstance = key;
+                        break;
+                    case MapChipEnum.Lock:
+                        Locked locked = Instantiate(LockedPrefab, _transform);
+                        locked.transform.localPosition = new Vector3(x, y, 0);
+                        lockedInstance = locked;
+                        break;
+                    case MapChipEnum.Warp:
+                        Warp warp = Instantiate(WarpPrefab, _transform);
+                        warp.transform.localPosition = new Vector3(x, y, 0);
+                        if (warpInstance == null)
+                        {
+                            warpInstance = warp;
+                        }
+                        else
+                        {
+                            warpInstance._warp = warp;
+                            warp._warp = warpInstance;
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        if (keyInstance != null && lockedInstance != null)
+        {
+            keyInstance.locked = lockedInstance;
+        }
+        return _startChip.Initialize();
     }
 }

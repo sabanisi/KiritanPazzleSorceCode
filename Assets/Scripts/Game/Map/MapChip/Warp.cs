@@ -3,7 +3,7 @@ using System.Collections;
 
 public class Warp : MonoBehaviour
 {
-    [SerializeField] private Warp _warp;
+    public Warp _warp;
     public bool isWarpOff;
 
     private void OnTriggerEnter2D(Collider2D collision)

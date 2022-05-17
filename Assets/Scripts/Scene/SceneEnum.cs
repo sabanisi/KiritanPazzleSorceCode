@@ -9,5 +9,7 @@ public enum SceneEnum
     Stage16, Stage17, Stage18, Stage19, Stage20,
     Stage21,Stage22,Stage23,Stage24,Stage25,
     Stage26, Stage27, Stage28, Stage29, Stage30,
-    StageCredit,StageFinish
+    StageCredit,StageFinish,
+    MapCreate,StageMapCreate,
+    ExtraMapSelect,ExtraMapPlay,StageExtraMapPlay
 }

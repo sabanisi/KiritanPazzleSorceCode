@@ -33,6 +33,10 @@ public class GameManager : MonoBehaviour
     private GameObject StageNodes;
 
     private Kiritan _player;
+    public Kiritan GetPlayer()
+    {
+        return _player;
+    }
 
     //ポーズ画面用フィールド
     [SerializeField] private Transform MainCameraTF;
@@ -154,7 +158,18 @@ public class GameManager : MonoBehaviour
         {
             if (Input.GetButtonDown("Enter"))
             {
-                ClearFragManager.SetClearFrag(nowScene, true);
+                if (nowScene != SceneEnum.StageMapCreate)
+                {
+                    if (nowScene != SceneEnum.StageExtraMapPlay)
+                    {
+                        ClearFragManager.SetClearFrag(nowScene, true);
+                    }
+                }
+                else
+                {
+                    MapMemory.instance.canClear = true;
+                }
+
                 GoStageSelect();
                 SoundManager.PlaySE(SoundManager.SE_Type.PressEnter2);
             }
@@ -176,11 +191,13 @@ public class GameManager : MonoBehaviour
     {
         MapStruct mapStruct = _sceneMapStock.GetMapStruct(_nowScene);
         nowScene = _nowScene;
-        if (mapStruct.collider != null)
+        CameraLimitInstance = Instantiate(mapStruct.collider);
+        _cameraManager.SetLimit(CameraLimitInstance);
+        if (_nowScene.Equals(SceneEnum.StageMapCreate)||_nowScene.Equals(SceneEnum.StageExtraMapPlay))
         {
-            CameraLimitInstance = Instantiate(mapStruct.collider);
-            _cameraManager.SetLimit(CameraLimitInstance) ;
+            CameraLimitInstance.transform.localPosition = new Vector3(-2.5f, -1.5f, 0);
         }
+
         dieNum = 0;
         time = 0;
         RestartDeal();
@@ -276,10 +293,11 @@ public class GameManager : MonoBehaviour
 
     private void PauseDealOfGoBack()
     {
-        
-        if (nowScene != SceneEnum.StageSelect1 && nowScene != SceneEnum.StageSelect2&&nowScene!=SceneEnum.StageSelect3
-            &&nowScene!=SceneEnum.StageSelect4&&nowScene!=SceneEnum.StageSelect5&&nowScene!=SceneEnum.StageSelect6&&
-            nowScene!=SceneEnum.ChutorialSelect&&nowScene!=SceneEnum.StageCredit&&nowScene!=SceneEnum.StageFinish)
+
+        if (nowScene != SceneEnum.StageSelect1 && nowScene != SceneEnum.StageSelect2 && nowScene != SceneEnum.StageSelect3
+            && nowScene != SceneEnum.StageSelect4 && nowScene != SceneEnum.StageSelect5 && nowScene != SceneEnum.StageSelect6
+            &&nowScene != SceneEnum.ChutorialSelect && nowScene != SceneEnum.StageCredit && nowScene != SceneEnum.StageFinish
+            && nowScene != SceneEnum.ExtraMapSelect)
         {
             isGameChange = true;
             GoStageSelect();
@@ -399,9 +417,17 @@ public class GameManager : MonoBehaviour
             SceneChangeManager.SceneChange(nowScene, SceneEnum.StageSelect6);
         }
         if (nowScene.Equals(SceneEnum.Chutorial1)|| nowScene.Equals(SceneEnum.Chutorial2)
-            || nowScene.Equals(SceneEnum.Chutorial3))
+            || nowScene.Equals(SceneEnum.Chutorial3)||nowScene.Equals(SceneEnum.ExtraMapSelect))
         {
             SceneChangeManager.SceneChange(nowScene, SceneEnum.ChutorialSelect);
+        }
+        if (nowScene.Equals(SceneEnum.StageMapCreate))
+        {
+            SceneChangeManager.SceneChange(nowScene, SceneEnum.MapCreate);
+        }
+        if (nowScene.Equals(SceneEnum.StageExtraMapPlay))
+        {
+            SceneChangeManager.SceneChange(nowScene, SceneEnum.ExtraMapPlay);
         }
     }
 
@@ -409,21 +435,39 @@ public class GameManager : MonoBehaviour
     private void RestartDeal()
     {
         MapStruct mapStruct = _sceneMapStock.GetMapStruct(nowScene);
+
         if (StageNodes != null)
         {
             Destroy(StageNodes);
         }
-        if (mapStruct.StageNodes != null)
+
+        if (!nowScene.Equals(SceneEnum.StageMapCreate))
         {
-            StageNodes = Instantiate(mapStruct.StageNodes);
+            if (mapStruct.StageNodes != null)
+            {
+                StageNodes = Instantiate(mapStruct.StageNodes);
+            }
         }
+       
         if (_player != null)
         {
             Destroy(_player.gameObject);
         }
-        _player = _stageGenarator.Initialize(mapStruct._tileMap);
-        _player.Initialize();
-        _cameraManager.Initialize(_player,mapStruct.canCameraMove,mapStruct.cameraPos,nowScene);
+
+        if (!nowScene.Equals(SceneEnum.StageMapCreate)&&!nowScene.Equals(SceneEnum.StageExtraMapPlay))
+        {
+            _player = _stageGenarator.Initialize(mapStruct._tileMap);
+            _player.Initialize();
+            _cameraManager.Initialize(_player, mapStruct.canCameraMove, mapStruct.cameraPos, nowScene);
+        }
+        else
+        {
+            //ステージ作成とプレイヤー取得を同時に行う
+            _player = _stageGenarator.InitializeByMapMemory();
+            _player.Initialize();
+            _cameraManager.Initialize(_player, false, new Vector2(-2.5f, -1.5f), nowScene);
+        }
+    
         dieCount = 0;
         isPause = false;
         isClear = false;
@@ -443,7 +487,7 @@ public class GameManager : MonoBehaviour
                 && nowScene != SceneEnum.StageSelect3 && nowScene != SceneEnum.StageSelect4
                 &&nowScene!=SceneEnum.StageSelect5&&nowScene!=SceneEnum.StageSelect6
                 && nowScene != SceneEnum.ChutorialSelect&&nowScene!=SceneEnum.StageCredit
-                &&nowScene!=SceneEnum.StageFinish)
+                &&nowScene!=SceneEnum.StageFinish && nowScene != SceneEnum.ExtraMapSelect)
             {
                 SoundManager.PlaySE(SoundManager.SE_Type.Hue);
                 SoundManager.PlayBGM(SoundManager.BGM_Type.Game);
@@ -552,7 +596,7 @@ public class GameManager : MonoBehaviour
     {
        PressZ.enabled = true;
        isGoBackFrag = true;
-        SoundManager.PlaySE(SoundManager.SE_Type.Pa2);
+       SoundManager.PlaySE(SoundManager.SE_Type.Pa2);
     }
 
     private void CreateC()

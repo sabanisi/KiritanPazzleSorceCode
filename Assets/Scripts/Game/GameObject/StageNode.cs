@@ -235,6 +235,11 @@ public class StageNode : MonoBehaviour
             case SceneEnum.Title:
                 SceneChangeManager.SceneChange(SceneEnum.ChutorialSelect, SceneEnum.Title);
                 break;
+
+            case SceneEnum.ExtraMapSelect:
+                SceneChangeManager.SceneChange(SceneEnum.ChutorialSelect, SceneEnum.ExtraMapSelect);
+                break;
+
             default:
                 Debug.Log("SelectNodeのGostageでバグ");
                 break;
